@@ -1,1 +1,112 @@
-<iframe src="https://discord.com/widget?id=1428598106458554462&theme=dark" width="350" height="500" allowtransparency="true" frameborder="0" sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts"></iframe>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fast DOCX-Preview Demo</title>
+    <!-- 
+      This is the magic: loading the pre-built, optimized "production" library from a CDN.
+    -->
+    <script src="https://unpkg.com/jszip/dist/jszip.min.js"></script>
+    <script src="https://unpkg.com/docx-preview@0.3.2/dist/docx-preview.js"></script>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        /* This is the default style from the library, needed for correct rendering */
+        .docx-wrapper {
+            background-color: #f0f0f0;
+            padding: 2rem 1rem;
+        }
+        .docx {
+            width: 8.5in;
+            min-height: 11in;
+            margin: 0 auto;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            padding: 1in;
+            box-sizing: border-box;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-100 min-h-screen p-4 md:p-8">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-2xl md:text-3xl font-bold text-center text-white mb-4">Fast DOCX Viewer Online</h1>
+        <p class="text-center text-gray-400 mb-6">
+            Make by giangnam0201.
+            It use docxjs, thanks for that!
+          https://github.com/VolodymyrBaydalka/docxjs
+        </p>
+
+        <!-- File Input -->
+        <div class="bg-gray-800 p-6 rounded-lg shadow-lg mb-6">
+            <label for="file-upload" class="block text-lg font-medium mb-2">Select a .docx file:</label>
+            <input 
+                type="file" 
+                id="file-upload"
+                accept=".docx"
+                class="block w-full text-sm text-gray-300
+                       file:mr-4 file:py-2 file:px-4
+                       file:rounded-lg file:border-0
+                       file:text-sm file:font-semibold
+                       file:bg-blue-600 file:text-white
+                       hover:file:bg-blue-700
+                       cursor-pointer"
+            />
+        </div>
+        
+        <!-- Status Message Box -->
+        <div id="status" class="hidden text-center p-4 rounded-lg mb-6"></div>
+
+        <!-- This is where the document will be rendered -->
+        <div id="docx-container" class="rounded-lg overflow-hidden"></div>
+    </div>
+
+    <script>
+        const fileUpload = document.getElementById('file-upload');
+        const container = document.getElementById('docx-container');
+        const statusEl = document.getElementById('status');
+
+        fileUpload.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            
+            if (file) {
+                // 1. Show loading message
+                showMessage('Loading...', 'bg-blue-600');
+                console.time('DocxRender'); // Start timer
+                
+                const reader = new FileReader();
+                
+                reader.onload = (e) => {
+                    const arrayBuffer = e.target.result;
+
+                    // 2. Render the document
+                    // This is the main library call
+                    docx.renderAsync(arrayBuffer, container)
+                        .then(x => {
+                            console.timeEnd('DocxRender'); // Stop timer and log time
+                            showMessage(`Render complete! (${console.timeLog.DocxRender || 'time'} ms)`, 'bg-green-600');
+                        })
+                        .catch(err => {
+                            console.error('Error rendering docx:', err);
+                            showMessage('Error: Could not render document.', 'bg-red-600');
+                        });
+                };
+
+                reader.onerror = (err) => {
+                    console.error('File reading error:', err);
+                    showMessage('Error: Could not read file.', 'bg-red-600');
+                }
+                
+                reader.readAsArrayBuffer(file);
+            }
+        });
+
+        function showMessage(message, styleClass) {
+            statusEl.textContent = message;
+            statusEl.className = `p-4 rounded-lg mb-6 text-white font-medium ${styleClass}`;
+        }
+    </script>
+</body>
+</html>
+
