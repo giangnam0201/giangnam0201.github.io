@@ -1,2 +1,531 @@
-All my project:
- - PyCodeX: https://giangnam0201.github.io/pycodex/
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Pinned Projects</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+            color: #e2e8f0;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 10% 20%, rgba(56, 189, 248, 0.05) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(139, 92, 246, 0.05) 0%, transparent 20%);
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 60px;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            background: linear-gradient(to right, #38bdf8, #818cf8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+            letter-spacing: -0.5px;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            color: #94a3b8;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+            gap: 30px;
+            animation: fadeIn 1s ease-out 0.2s both;
+        }
+
+        .project-card {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(56, 189, 248, 0.1);
+            border-radius: 20px;
+            padding: 30px;
+            position: relative;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .project-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(56, 189, 248, 0.1), transparent);
+            transition: left 0.6s;
+        }
+
+        .project-card:hover::before {
+            left: 100%;
+        }
+
+        .project-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            border-color: rgba(56, 189, 248, 0.3);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3), 0 0 30px rgba(56, 189, 248, 0.1);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+
+        .repo-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .repo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #38bdf8 0%, #818cf8 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .repo-name {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #f1f5f9;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .repo-name::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(to right, #38bdf8, #818cf8);
+            transition: width 0.3s ease;
+        }
+
+        .project-card:hover .repo-name::after {
+            width: 100%;
+        }
+
+        .visibility-badge {
+            background: rgba(56, 189, 248, 0.15);
+            color: #38bdf8;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            backdrop-filter: blur(5px);
+        }
+
+        .description {
+            color: #cbd5e1;
+            font-size: 1rem;
+            line-height: 1.6;
+            margin: 20px 0;
+            min-height: 50px;
+        }
+
+        .card-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(56, 189, 248, 0.1);
+        }
+
+        .language {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            color: #94a3b8;
+        }
+
+        .language-color {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            border: 2px solid rgba(0, 0, 0, 0.3);
+        }
+
+        .stars {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: #fde047;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .project-card:hover .stars {
+            transform: scale(1.1);
+            text-shadow: 0 0 10px rgba(253, 224, 71, 0.5);
+        }
+
+        .stars i {
+            transition: transform 0.3s ease;
+        }
+
+        .project-card:hover .stars i {
+            transform: rotate(15deg);
+        }
+
+        .stats-overlay {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .project-card:hover .stats-overlay {
+            opacity: 1;
+        }
+
+        .stat-item {
+            background: rgba(15, 23, 42, 0.7);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: #e2e8f0;
+            border: 1px solid rgba(56, 189, 248, 0.1);
+            backdrop-filter: blur(5px);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .floating-particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .particle {
+            position: absolute;
+            background: rgba(56, 189, 248, 0.3);
+            border-radius: 50%;
+            animation: float 15s infinite linear;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) translateX(0) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100vh) translateX(100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .projects-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .project-card {
+                padding: 20px;
+            }
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #38bdf8 0%, #818cf8 100%);
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #0ea5e9 0%, #6366f1 100%);
+        }
+    </style>
+</head>
+<body>
+    <div class="floating-particles" id="particles"></div>
+    
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-thumbtack"></i> Pinned Projects</h1>
+            <p>Showcasing my favorite GitHub repositories</p>
+        </div>
+
+        <div class="projects-grid" id="projectsGrid">
+            <!-- Projects will be dynamically inserted here -->
+        </div>
+    </div>
+
+    <script>
+        // Project data extracted from GitHub
+        const projects = [
+            {
+                name: "python-music-visualizer",
+                description: "A feature-rich, modular music visualizer built with Python and Pygame.",
+                language: "Python",
+                languageColor: "#3572A5",
+                stars: 1,
+                url: "https://github.com/giangnam0201/python-music-visualizer"
+            },
+            {
+                name: "pycodex",
+                description: "PyCodeX (VS Code–style editor in Python)",
+                language: "Python",
+                languageColor: "#3572A5",
+                stars: 1,
+                url: "https://github.com/giangnam0201/pycodex"
+            },
+            {
+                name: "Windows-10-Batch-Simulator",
+                description: "A surprisingly functional Windows 10 simulator written entirely in Windows Batch Script, PowerShell, and C#.",
+                language: "Batchfile",
+                languageColor: "#C1F12E",
+                stars: 1,
+                url: "https://github.com/giangnam0201/Windows-10-Batch-Simulator"
+            },
+            {
+                name: "docxviewer",
+                description: "",
+                language: "HTML",
+                languageColor: "#e34c26",
+                stars: 1,
+                url: "https://github.com/giangnam0201/docxviewer"
+            },
+            {
+                name: "Discord-Webhook-Chat-Simulator-Bot",
+                description: "A fun Discord bot that creates webhooks mimicking your server members and simulates realistic conversations between them!",
+                language: "Python",
+                languageColor: "#3572A5",
+                stars: 1,
+                url: "https://github.com/giangnam0201/Discord-Webhook-Chat-Simulator-Bot"
+            },
+            {
+                name: "aio-social-media-booster",
+                description: "AIO Social Media Booster",
+                language: "Python",
+                languageColor: "#3572A5",
+                stars: 1,
+                url: "https://github.com/giangnam0201/aio-social-media-booster"
+            }
+        ];
+
+        // Language icon mapping
+        const languageIcons = {
+            'Python': 'fab fa-python',
+            'HTML': 'fab fa-html5',
+            'Batchfile': 'fas fa-terminal'
+        };
+
+        // Generate project cards
+        function generateProjectCards() {
+            const grid = document.getElementById('projectsGrid');
+            
+            projects.forEach((project, index) => {
+                const card = document.createElement('div');
+                card.className = 'project-card';
+                card.style.animationDelay = `${index * 0.1}s`;
+                
+                const icon = languageIcons[project.language] || 'fas fa-code';
+                
+                card.innerHTML = `
+                    <div class="stats-overlay">
+                        <div class="stat-item">
+                            <i class="fas fa-code-branch"></i> N/A
+                        </div>
+                        <div class="stat-item">
+                            <i class="fas fa-eye"></i> N/A
+                        </div>
+                    </div>
+                    
+                    <div class="card-header">
+                        <div class="repo-info">
+                            <div class="repo-icon">
+                                <i class="${icon}"></i>
+                            </div>
+                            <a href="${project.url}" target="_blank" class="repo-name" title="${project.name}">
+                                ${project.name}
+                            </a>
+                        </div>
+                        <span class="visibility-badge">Public</span>
+                    </div>
+                    
+                    <p class="description">
+                        ${project.description || 'No description available'}
+                    </p>
+                    
+                    <div class="card-footer">
+                        <div class="language">
+                            <div class="language-color" style="background-color: ${project.languageColor}"></div>
+                            <span>${project.language}</span>
+                        </div>
+                        <div class="stars">
+                            <i class="fas fa-star"></i>
+                            <span>${project.stars}</span>
+                        </div>
+                    </div>
+                `;
+                
+                grid.appendChild(card);
+            });
+        }
+
+        // Create floating particles
+        function createParticles() {
+            const container = document.getElementById('particles');
+            const particleCount = 15;
+            
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                
+                const size = Math.random() * 4 + 2;
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                particle.style.left = `${Math.random() * 100}%`;
+                particle.style.animationDelay = `${Math.random() * 15}s`;
+                particle.style.animationDuration = `${15 + Math.random() * 10}s`;
+                
+                container.appendChild(particle);
+            }
+        }
+
+        // Add interactive effects
+        function addInteractiveEffects() {
+            const cards = document.querySelectorAll('.project-card');
+            
+            cards.forEach(card => {
+                // Mouse move parallax effect
+                card.addEventListener('mousemove', (e) => {
+                    const rect = card.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    
+                    const centerX = rect.width / 2;
+                    const centerY = rect.height / 2;
+                    
+                    const rotateX = (y - centerY) / 20;
+                    const rotateY = (centerX - x) / 20;
+                    
+                    card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateZ(10px)`;
+                });
+                
+                card.addEventListener('mouseleave', () => {
+                    card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) translateZ(0)';
+                });
+            });
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            generateProjectCards();
+            createParticles();
+            addInteractiveEffects();
+        });
+
+        // Smooth scroll reveal
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        setTimeout(() => {
+            document.querySelectorAll('.project-card').forEach(card => {
+                observer.observe(card);
+            });
+        }, 100);
+    </script>
+</body>
+</html>
