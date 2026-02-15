@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
     <title>All-In-One IPTV Player</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
@@ -16,9 +17,7 @@
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
-        .channel-card {
-            transition: all 0.3s ease;
-        }
+        .channel-card { transition: all 0.3s ease; }
         .channel-card:hover {
             transform: translateX(5px);
             background: rgba(59, 130, 246, 0.1);
@@ -44,25 +43,15 @@
             color: white;
         }
         /* TV Mode styles */
-        .tv-mode .sidebar {
-            display: none;
-        }
-        .tv-mode .main-content {
-            width: 100%;
-            height: 100vh;
-        }
-        .tv-mode .video-container {
-            height: 100vh;
-            border-radius: 0;
-        }
+        .tv-mode .sidebar { display: none; }
+        .tv-mode .main-content { width: 100%; height: 100vh; }
+        .tv-mode .video-container { height: 100vh; border-radius: 0; margin: 0; }
     </style>
 </head>
 <body class="bg-gray-900 text-white overflow-hidden h-screen">
 
     <div class="flex h-full" id="appContainer">
-        <!-- Sidebar -->
         <aside class="sidebar w-96 bg-gray-900 border-r border-gray-800 flex flex-col h-full transition-all duration-300" id="sidebar">
-            <!-- Header -->
             <div class="p-6 border-b border-gray-800">
                 <div class="flex items-center justify-between mb-4">
                     <h1 class="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
@@ -75,7 +64,6 @@
                     </button>
                 </div>
                 
-                <!-- Search -->
                 <div class="relative">
                     <input type="text" id="searchInput" placeholder="Search channels..." 
                         class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 pl-10 focus:outline-none focus:border-blue-500 transition">
@@ -85,7 +73,6 @@
                 </div>
             </div>
 
-            <!-- Categories -->
             <div class="px-4 py-3 border-b border-gray-800">
                 <div class="flex gap-2 overflow-x-auto scrollbar-hide" id="categoryList">
                     <button class="category-btn active px-4 py-1.5 rounded-full text-sm font-medium bg-gray-800 hover:bg-gray-700 transition whitespace-nowrap" data-category="all">
@@ -97,7 +84,6 @@
                 </div>
             </div>
 
-            <!-- Channel List -->
             <div class="flex-1 overflow-y-auto scrollbar-hide" id="channelList">
                 <div class="p-4 text-center text-gray-500">
                     <div class="loader mx-auto mb-2"></div>
@@ -105,20 +91,16 @@
                 </div>
             </div>
 
-            <!-- Stats -->
             <div class="p-4 border-t border-gray-800 text-xs text-gray-500 flex justify-between">
                 <span id="channelCount">0 channels</span>
                 <span id="currentTime"></span>
             </div>
         </aside>
 
-        <!-- Main Content -->
         <main class="main-content flex-1 flex flex-col bg-black relative">
-            <!-- Video Container -->
             <div class="video-container flex-1 relative bg-black flex items-center justify-center overflow-hidden rounded-lg m-4">
-                <video id="videoPlayer" class="w-full h-full object-contain" controls playsinline></video>
+                <video id="videoPlayer" class="w-full h-full object-contain" controls playsinline muted></video>
                 
-                <!-- Loading Overlay -->
                 <div id="loadingOverlay" class="absolute inset-0 bg-black bg-opacity-80 flex items-center justify-center hidden z-20">
                     <div class="text-center">
                         <div class="loader mx-auto mb-4"></div>
@@ -126,28 +108,30 @@
                     </div>
                 </div>
 
-                <!-- Error Overlay -->
                 <div id="errorOverlay" class="absolute inset-0 bg-black bg-opacity-90 flex items-center justify-center hidden z-30">
-                    <div class="text-center p-6">
+                    <div class="text-center p-6 max-w-md">
                         <svg class="w-16 h-16 text-red-500 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                         </svg>
                         <h3 class="text-xl font-bold mb-2">Stream Error</h3>
-                        <p class="text-gray-400 mb-4">Unable to load this channel</p>
+                        <p id="errorText" class="text-gray-400 mb-4">Unable to load this channel</p>
+                        
+                        <div class="text-xs text-yellow-500 bg-yellow-900/30 p-2 rounded mb-4 text-left">
+                            <strong>Note:</strong> If you are on GitHub Pages, HTTP streams will fail. Try running this file locally on your computer.
+                        </div>
+
                         <button onclick="retryStream()" class="px-6 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg transition">
                             Retry
                         </button>
                     </div>
                 </div>
 
-                <!-- Channel Info Overlay -->
                 <div id="infoOverlay" class="absolute top-4 left-4 bg-black bg-opacity-70 backdrop-blur-md rounded-lg p-4 hidden z-10 transition-opacity duration-300">
                     <h2 id="currentChannelName" class="text-lg font-bold mb-1">Select a channel</h2>
                     <p id="currentChannelCategory" class="text-sm text-gray-400">-</p>
                 </div>
             </div>
 
-            <!-- Mobile Toggle Button -->
             <button onclick="toggleSidebar()" class="lg:hidden absolute top-4 right-4 z-40 bg-gray-800 p-2 rounded-lg shadow-lg">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
@@ -158,30 +142,27 @@
 
     <script>
         const M3U_URL = 'https://raw.githubusercontent.com/vuminhthanh12/vuminhthanh12/refs/heads/main/vmttv';
+        // Base64 SVG Placeholder to prevent 404/DNS errors
+        const PLACEHOLDER_IMG = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40' width='40' height='40'%3E%3Crect width='40' height='40' fill='%23374151'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='14' fill='%239CA3AF'%3ETV%3C/text%3E%3C/svg%3E";
+
         let channels = [];
         let currentChannel = null;
         let hls = null;
         let favorites = JSON.parse(localStorage.getItem('iptv_favorites') || '[]');
         let currentCategory = 'all';
 
-        // Initialize
         document.addEventListener('DOMContentLoaded', () => {
             loadChannels();
             updateTime();
             setInterval(updateTime, 1000);
             
-            // Search functionality
             document.getElementById('searchInput').addEventListener('input', (e) => {
                 filterChannels(e.target.value);
             });
 
-            // Keyboard shortcuts
             document.addEventListener('keydown', (e) => {
                 if (e.key === 'Escape' && document.body.classList.contains('tv-mode')) {
                     toggleTVMode();
-                }
-                if (e.key === 'f') {
-                    toggleFullscreen();
                 }
             });
         });
@@ -189,13 +170,13 @@
         async function loadChannels() {
             try {
                 const response = await fetch(M3U_URL);
+                if (!response.ok) throw new Error('Network response was not ok');
                 const text = await response.text();
                 parseM3U(text);
                 renderCategories();
                 renderChannels();
                 updateStats();
                 
-                // Auto-play first channel
                 if (channels.length > 0) {
                     playChannel(channels[0]);
                 }
@@ -203,7 +184,7 @@
                 console.error('Error loading channels:', error);
                 document.getElementById('channelList').innerHTML = `
                     <div class="p-4 text-center text-red-500">
-                        <p>Failed to load channels</p>
+                        <p>Failed to load playlist.</p>
                         <button onclick="loadChannels()" class="mt-2 text-blue-400 hover:underline">Retry</button>
                     </div>
                 `;
@@ -212,58 +193,67 @@
 
         function parseM3U(content) {
             const lines = content.split('\n');
-            let currentChannel = null;
+            let currentCh = null;
             
             for (let i = 0; i < lines.length; i++) {
                 const line = lines[i].trim();
                 
                 if (line.startsWith('#EXTINF')) {
-                    // Parse EXTINF line
                     const logoMatch = line.match(/tvg-logo="([^"]*)"/);
                     const groupMatch = line.match(/group-title="([^"]*)"/);
                     const nameMatch = line.match(/,(.*)$/);
                     
-                    currentChannel = {
+                    currentCh = {
                         name: nameMatch ? nameMatch[1].trim() : `Channel ${channels.length + 1}`,
                         logo: logoMatch ? logoMatch[1].trim() : '',
                         group: groupMatch ? groupMatch[1].trim() : 'Other',
                         url: '',
                         id: channels.length
                     };
-                } else if (line.startsWith('http') && currentChannel) {
-                    currentChannel.url = line;
-                    channels.push(currentChannel);
-                    currentChannel = null;
+                } else if (line.startsWith('http') && currentCh) {
+                    currentCh.url = line;
+                    channels.push(currentCh);
+                    currentCh = null;
                 }
             }
         }
 
         function renderCategories() {
-            const categories = [...new Set(channels.map(c => c.group))];
+            const categories = [...new Set(channels.map(c => c.group))].sort();
             const container = document.getElementById('categoryList');
+            // Keep All and Favorites, clear rest
+            while (container.children.length > 2) {
+                container.removeChild(container.lastChild);
+            }
             
             categories.forEach(cat => {
+                if (!cat) return;
                 const btn = document.createElement('button');
                 btn.className = 'category-btn px-4 py-1.5 rounded-full text-sm font-medium bg-gray-800 hover:bg-gray-700 transition whitespace-nowrap';
                 btn.textContent = cat;
                 btn.dataset.category = cat;
-                btn.onclick = () => setCategory(cat);
+                btn.onclick = (e) => {
+                    document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+                    e.target.classList.add('active');
+                    setCategory(cat);
+                };
                 container.appendChild(btn);
             });
 
-            // Set up category buttons
             document.querySelectorAll('.category-btn').forEach(btn => {
                 btn.addEventListener('click', (e) => {
-                    document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
-                    e.target.classList.add('active');
-                    setCategory(e.target.dataset.category);
+                    if(e.target.dataset.category === 'all' || e.target.dataset.category === 'favorites') {
+                         document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+                         e.target.classList.add('active');
+                         setCategory(e.target.dataset.category);
+                    }
                 });
             });
         }
 
         function setCategory(category) {
             currentCategory = category;
-            renderChannels();
+            renderChannels(document.getElementById('searchInput').value);
         }
 
         function renderChannels(searchTerm = '') {
@@ -272,21 +262,23 @@
             
             let filtered = channels;
             
-            // Filter by category
             if (currentCategory === 'favorites') {
                 filtered = channels.filter(c => favorites.includes(c.id));
             } else if (currentCategory !== 'all') {
                 filtered = channels.filter(c => c.group === currentCategory);
             }
             
-            // Filter by search
             if (searchTerm) {
                 filtered = filtered.filter(c => 
                     c.name.toLowerCase().includes(searchTerm.toLowerCase())
                 );
             }
             
-            filtered.forEach(channel => {
+            // Limit render to 50 items initially for performance if list is huge
+            // (Simple optimization)
+            const displayList = filtered.slice(0, 100); 
+
+            displayList.forEach(channel => {
                 const isFav = favorites.includes(channel.id);
                 const isActive = currentChannel && currentChannel.id === channel.id;
                 
@@ -294,13 +286,17 @@
                 div.className = `channel-card p-3 cursor-pointer flex items-center gap-3 border-b border-gray-800 ${isActive ? 'active-channel' : 'hover:bg-gray-800'}`;
                 div.onclick = () => playChannel(channel);
                 
+                // Using fallback logic for images inline
+                const logoSrc = channel.logo ? channel.logo : PLACEHOLDER_IMG;
+
                 div.innerHTML = `
-                    <img src="${channel.logo || 'https://via.placeholder.com/40?text=TV'}" 
+                    <img src="${logoSrc}" 
                          alt="${channel.name}" 
                          class="w-10 h-10 rounded object-cover bg-gray-700"
-                         onerror="this.src='https://via.placeholder.com/40?text=TV'">
+                         loading="lazy"
+                         onerror="this.src='${PLACEHOLDER_IMG}'">
                     <div class="flex-1 min-w-0">
-                        <h3 class="font-medium text-sm truncate">${channel.name}</h3>
+                        <h3 class="font-medium text-sm truncate text-white">${channel.name}</h3>
                         <p class="text-xs text-gray-500 truncate">${channel.group}</p>
                     </div>
                     <button onclick="toggleFavorite(event, ${channel.id})" 
@@ -344,27 +340,23 @@
             const errorOverlay = document.getElementById('errorOverlay');
             const infoOverlay = document.getElementById('infoOverlay');
             
-            // Update UI
+            // UI Updates
             loadingOverlay.classList.remove('hidden');
             errorOverlay.classList.add('hidden');
             infoOverlay.classList.remove('hidden');
             document.getElementById('currentChannelName').textContent = channel.name;
             document.getElementById('currentChannelCategory').textContent = channel.group;
             
-            // Update active state in list
             renderChannels(document.getElementById('searchInput').value);
             
-            // Destroy previous HLS instance
-            if (hls) {
-                hls.destroy();
-            }
-            
-            // Setup new stream
             if (Hls.isSupported()) {
+                if (hls) {
+                    hls.destroy();
+                }
+                
                 hls = new Hls({
                     enableWorker: true,
                     lowLatencyMode: true,
-                    backBufferLength: 90
                 });
                 
                 hls.loadSource(channel.url);
@@ -372,35 +364,52 @@
                 
                 hls.on(Hls.Events.MANIFEST_PARSED, () => {
                     loadingOverlay.classList.add('hidden');
-                    video.play().catch(e => console.log('Auto-play prevented:', e));
+                    // Promise based play to catch autoplay errors
+                    var playPromise = video.play();
+                    if (playPromise !== undefined) {
+                        playPromise.catch(error => {
+                            console.log("Autoplay prevented:", error);
+                            // Not a fatal error, user just needs to click play
+                            loadingOverlay.classList.add('hidden');
+                        });
+                    }
                 });
-                
-                hls.on(Hls.Events.ERROR, (event, data) => {
+
+                hls.on(Hls.Events.ERROR, function (event, data) {
                     if (data.fatal) {
-                        loadingOverlay.classList.add('hidden');
-                        errorOverlay.classList.remove('hidden');
+                        switch (data.type) {
+                        case Hls.ErrorTypes.NETWORK_ERROR:
+                            console.log('fatal network error encountered, try to recover');
+                            hls.startLoad();
+                            break;
+                        case Hls.ErrorTypes.MEDIA_ERROR:
+                            console.log('fatal media error encountered, try to recover');
+                            hls.recoverMediaError();
+                            break;
+                        default:
+                            console.log('cannot recover');
+                            hls.destroy();
+                            showError("Stream error (Mixed Content or CORS)");
+                            break;
+                        }
                     }
                 });
             } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
                 video.src = channel.url;
                 video.addEventListener('loadedmetadata', () => {
                     loadingOverlay.classList.add('hidden');
-                    video.play().catch(e => console.log('Auto-play prevented:', e));
+                    video.play();
                 });
                 video.addEventListener('error', () => {
-                    loadingOverlay.classList.add('hidden');
-                    errorOverlay.classList.remove('hidden');
+                    showError("Native player error");
                 });
-            } else {
-                loadingOverlay.classList.add('hidden');
-                errorOverlay.classList.remove('hidden');
             }
-            
-            // Hide info overlay after 3 seconds
-            setTimeout(() => {
-                infoOverlay.classList.add('opacity-0');
-                setTimeout(() => infoOverlay.classList.add('hidden'), 300);
-            }, 3000);
+        }
+
+        function showError(msg) {
+            document.getElementById('loadingOverlay').classList.add('hidden');
+            document.getElementById('errorOverlay').classList.remove('hidden');
+            document.getElementById('errorText').innerText = msg || "Stream failed to load";
         }
 
         function retryStream() {
@@ -416,33 +425,21 @@
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
             sidebar.classList.toggle('hidden');
-        }
-
-        function toggleFullscreen() {
-            const video = document.getElementById('videoPlayer');
-            if (!document.fullscreenElement) {
-                video.requestFullscreen().catch(e => console.log(e));
+            if (!sidebar.classList.contains('hidden')) {
+                sidebar.classList.add('absolute', 'z-50', 'bg-gray-900', 'h-full');
             } else {
-                document.exitFullscreen();
+                sidebar.classList.remove('absolute', 'z-50');
             }
-        }
-
-        function updateStats() {
-            document.getElementById('channelCount').textContent = `${channels.length} channels`;
         }
 
         function updateTime() {
             const now = new Date();
-            document.getElementById('currentTime').textContent = now.toLocaleTimeString();
+            document.getElementById('currentTime').textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
         }
-
-        // Handle window resize
-        window.addEventListener('resize', () => {
-            if (window.innerWidth > 1024) {
-                document.getElementById('sidebar').classList.remove('hidden');
-            }
-        });
+        
+        function updateStats() {
+            document.getElementById('channelCount').textContent = `${channels.length} channels`;
+        }
     </script>
 </body>
-
 </html>
